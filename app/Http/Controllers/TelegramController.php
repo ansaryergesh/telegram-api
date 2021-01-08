@@ -9,11 +9,11 @@ use Carbon\Carbon;
 class TelegramController extends Controller
 {
     public function nonAnswered() {
-        $nonAnswered = Telegrammes::where('status', 0)->get()->toJson(JSON_PRETTY_PRINT);;
+        $nonAnswered = Telegrammes::where('status', 0)->get();
         return response($nonAnswered, 200);
     }
     public function answered() {
-        $nonAnswered = Telegrammes::where('status', 1)->get()->toJson(JSON_PRETTY_PRINT);;
+        $nonAnswered = Telegrammes::where('status', 1)->get();
         return response($nonAnswered, 200);
     }
     public function index(Request $request) {
@@ -83,7 +83,7 @@ class TelegramController extends Controller
 
     public function editTelega($id) {
       $message = Telegrammes::find($id);
-      if($message) {
+      if(isset($message)) {
           try {
               DB::beginTransaction();
                 $message->status=1;
@@ -93,7 +93,7 @@ class TelegramController extends Controller
               return response()->json([
                 "success"=> 'true',
                 "message" => "updated"
-            ], 202);
+            ], 200);
           }catch(\Exception $e){
               DB::rollback();
               return response()->json([
