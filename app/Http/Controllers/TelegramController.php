@@ -67,8 +67,7 @@ class TelegramController extends Controller
     //Удалить данные выше недели
     public function delete() {
         $dates = \Carbon\Carbon::today()->subDays(7);
-        $result = DB::select('select * from telegrammes where created_at < ?', [$dates]);
-        // $result = Telegrammes::where('created_at', '<', $dates)->get();
+        $result = DB::table('telegrammes')->where('created_at','<', $dates)->get();
         if(count($result) !== 0) {
             $result->each->delete();
             return response()->json([
