@@ -9,11 +9,11 @@ use Carbon\Carbon;
 class TelegramController extends Controller
 {
     public function nonAnswered() {
-        $nonAnswered = Telegrammes::where('status', 0)->get();
+        $nonAnswered = DB::select('select * from telegrammes where status = ?', [0]);
         return response()->json($nonAnswered);
     }
     public function answered() {
-        $answered = Telegrammes::where('status', 1)->get();
+        $answered = DB::select('select * from telegrammes where status = ?', [1]);
         return response()->json($answered);
     }
     public function index(Request $request) {
@@ -42,13 +42,15 @@ class TelegramController extends Controller
             }
 
             DB::beginTransaction();
-            $testing = Telegrammes::insertGetId([
-                'message_id' =>$message_id,
-                'iin'=>$iin,
-                'name'=>$name,
-                'question'=>$question,
-                'created_at' => Carbon::now(),
-            ]);
+            $testing = DB::table('telegrammes')->insert(
+                array(
+                  'message_id' =>$message_id,
+                  'iin'=>$iin,
+                  'name'=>$name,
+                  'question'=>$question,
+                  'created_at' => Carbon::now(),
+                )
+            );
             if (!$testing){
                 DB::rollback();
                 $result['message'] = 'Что то произошло не так попробуйте позже';
@@ -65,7 +67,8 @@ class TelegramController extends Controller
     //Удалить данные выше недели
     public function delete() {
         $dates = \Carbon\Carbon::today()->subDays(7);
-        $result = Telegrammes::where('created_at', '<', $dates)->get();
+        $result = DB::select('select * from telegrammes where created_at < ?', [$dates]);
+        // $result = Telegrammes::where('created_at', '<', $dates)->get();
         if(count($result) !== 0) {
             $result->each->delete();
             return response()->json([
@@ -83,6 +86,10 @@ class TelegramController extends Controller
 
     public function editTelega($id) {
       $message = Telegrammes::find($id);
+    //   $message = DB::table('telegrammes')->where('id', $id)->first()->toJson();
+      return $message;
+      return response()->json($message);
+      $message = DB::table('telegrammes')->where('id', $id)->first();
       if(isset($message)) {
           try {
               DB::beginTransaction();
