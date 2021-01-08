@@ -9,11 +9,11 @@ use Carbon\Carbon;
 class TelegramController extends Controller
 {
     public function nonAnswered() {
-        $nonAnswered = DB::select('select * from telegrammes where status = ?', [0]);
+        $nonAnswered = DB::table('telegrammes')->where('status', 0)->get();
         return response()->json($nonAnswered);
     }
     public function answered() {
-        $answered = DB::select('select * from telegrammes where status = ?', [1]);
+        $answered = DB::table('telegrammes')->where('status', 1)->get();
         return response()->json($answered);
     }
     public function index(Request $request) {
@@ -85,14 +85,11 @@ class TelegramController extends Controller
     }
 
     public function editTelega($id) {
-      $message = Telegrammes::find($id);
-    //   $message = DB::table('telegrammes')->where('id', $id)->first()->toJson();
+      $message = DB::table('telegrammes')->where('id', $id)->first();
       if(isset($message)) {
           try {
               DB::beginTransaction();
-                $message->status=1;
-                $message->updated_at=Carbon::now();
-                $message->save();
+              DB::table('telegrammes')->where('id',$id)->update(['status'=>1, 'updated_at'=>Carbon::now()]);
               DB::commit();
               return response()->json([
                 "success"=> 'true',
