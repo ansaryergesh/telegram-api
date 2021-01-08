@@ -87,9 +87,6 @@ class TelegramController extends Controller
     public function editTelega($id) {
       $message = Telegrammes::find($id);
     //   $message = DB::table('telegrammes')->where('id', $id)->first()->toJson();
-      return $message;
-      return response()->json($message);
-      $message = DB::table('telegrammes')->where('id', $id)->first();
       if(isset($message)) {
           try {
               DB::beginTransaction();
