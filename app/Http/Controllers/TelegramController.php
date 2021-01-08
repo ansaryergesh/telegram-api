@@ -10,17 +10,17 @@ class TelegramController extends Controller
 {
     public function nonAnswered() {
         $nonAnswered = Telegrammes::where('status', 0)->get();
-        return response($nonAnswered, 200);
+        return response()->json($nonAnswered);
     }
     public function answered() {
-        $nonAnswered = Telegrammes::where('status', 1)->get();
-        return response($nonAnswered, 200);
+        $answered = Telegrammes::where('status', 1)->get();
+        return response()->json($answered);
     }
     public function index(Request $request) {
         $message_id = $request->input('message_id');
         $iin = $request->input('iin');
         $name = $request->input('name');
-        $vopros = $request->input('question');
+        $question = $request->input('question');
         $result['success'] = false;
 
         do {
@@ -36,8 +36,8 @@ class TelegramController extends Controller
                 $result['message'] = 'name required';
                 break;
             }
-            if(!$vopros){
-                $result['message'] = 'vopros required';
+            if(!$question){
+                $result['message'] = 'question required';
                 break;
             }
 
@@ -46,7 +46,7 @@ class TelegramController extends Controller
                 'message_id' =>$message_id,
                 'iin'=>$iin,
                 'name'=>$name,
-                'question'=>$vopros,
+                'question'=>$question,
                 'created_at' => Carbon::now(),
             ]);
             if (!$testing){
